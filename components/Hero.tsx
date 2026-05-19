@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import StarField from './StarField'
 
 const PARTICLES = [
@@ -44,14 +44,17 @@ function ParticleShape({ shape, size }: { shape: string; size: number }) {
 }
 
 export default function Hero() {
-  const heroRef = useRef<HTMLDivElement>(null)
-  const [mouse, setMouse] = useState({ x: 50, y: 50 })
-  const [mounted, setMounted] = useState(false)
+  const heroRef  = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [mouse, setMouse]           = useState({ x: 50, y: 50 })
+  const [mounted, setMounted]       = useState(false)
+  const [videoReady, setVideoReady] = useState(false)
 
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const yContent = useTransform(scrollYProgress, [0, 1], ['0%', '22%'])
-  const yBg     = useTransform(scrollYProgress, [0, 1], ['0%', '14%'])
-  const opacity = useTransform(scrollYProgress, [0, 0.65], [1, 0])
+  const yVideo   = useTransform(scrollYProgress, [0, 1], ['0%', '18%'])   // video parallax
+  const yBg      = useTransform(scrollYProgress, [0, 1], ['0%', '12%'])
+  const opacity  = useTransform(scrollYProgress, [0, 0.65], [1, 0])
 
   useEffect(() => { setMounted(true) }, [])
 
@@ -66,11 +69,11 @@ export default function Hero() {
 
   const container = {
     hidden: {},
-    visible: { transition: { staggerChildren: 0.13, delayChildren: 0.55 } },
+    visible: { transition: { staggerChildren: 0.13, delayChildren: 0.7 } },
   }
   const item = {
     hidden: { opacity: 0, y: 38, filter: 'blur(8px)' },
-    visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } },
+    visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.05, ease: [0.22, 1, 0.36, 1] } },
   }
 
   return (
@@ -80,38 +83,118 @@ export default function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black"
       onMouseMove={onMouseMove}
     >
-      {/* Canvas starfield */}
-      <StarField />
 
-      {/* Parallax background layers */}
-      <motion.div className="absolute inset-0 pointer-events-none" style={{ y: yBg }}>
-        {/* Central aurora */}
+      {/* ══════════════════════════════════════════════════
+          LAYER 0 — Cinematic video background
+      ══════════════════════════════════════════════════ */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Parallax video wrapper */}
+        <motion.div
+          className="absolute inset-0 scale-110"   /* slight over-size so parallax never shows edges */
+          style={{ y: yVideo }}
+        >
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            onCanPlay={() => setVideoReady(true)}
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              filter: 'brightness(0.68) contrast(1.12) saturate(0.82)',
+              willChange: 'transform',
+            }}
+          >
+            <source src="/videos/presentation.mp4" type="video/mp4" />
+          </video>
+        </motion.div>
+
+        {/* Fade-in when video is ready — shows black until first frame decoded */}
+        <motion.div
+          className="absolute inset-0 bg-black"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: videoReady ? 0 : 1 }}
+          transition={{ duration: 1.6, ease: 'easeInOut' }}
+        />
+
+        {/* ── Cinematic overlay stack ── */}
+
+        {/* 1. Base tint — uniform darkening for readability */}
+        <div className="absolute inset-0 bg-black/38" />
+
+        {/* 2. Radial vignette — dark edges, slightly open center */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 110% 80% at 50% 50%, rgba(212,175,55,0.055) 0%, rgba(180,130,30,0.02) 40%, transparent 70%)',
+            background: 'radial-gradient(ellipse 85% 75% at 50% 45%, transparent 20%, rgba(0,0,0,0.52) 100%)',
           }}
         />
-        {/* Off-center accent glows */}
+
+        {/* 3. Top bar — nav legibility */}
         <div
-          className="absolute w-[700px] h-[400px] rounded-full"
+          className="absolute inset-x-0 top-0 h-44 pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%)' }}
+        />
+
+        {/* 4. Bottom bar — text content legibility */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-3/4 pointer-events-none"
+          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 45%, transparent 100%)' }}
+        />
+
+        {/* 5. Warm gold color grade over the image */}
+        <div
+          className="absolute inset-0"
           style={{
-            top: '15%', left: '10%',
-            background: 'radial-gradient(ellipse, rgba(180,120,20,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse 100% 60% at 50% 38%, rgba(212,175,55,0.06) 0%, transparent 65%)',
+          }}
+        />
+
+        {/* 6. Side vignettes */}
+        <div className="absolute inset-y-0 left-0 w-24 pointer-events-none" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.35), transparent)' }} />
+        <div className="absolute inset-y-0 right-0 w-24 pointer-events-none" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.35), transparent)' }} />
+      </div>
+
+      {/* ══════════════════════════════════════════════════
+          LAYER 1 — Starfield canvas (blends via 'screen')
+      ══════════════════════════════════════════════════ */}
+      <StarField />
+
+      {/* ══════════════════════════════════════════════════
+          LAYER 2 — Atmospheric glows (parallax)
+      ══════════════════════════════════════════════════ */}
+      <motion.div className="absolute inset-0 pointer-events-none" style={{ y: yBg }}>
+        {/* Center gold aurora — subtle on top of video */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse 110% 70% at 50% 50%, rgba(212,175,55,0.04) 0%, transparent 65%)',
+          }}
+        />
+        <div
+          className="absolute w-[600px] h-[350px] rounded-full"
+          style={{
+            top: '12%', left: '8%',
+            background: 'radial-gradient(ellipse, rgba(180,120,20,0.055) 0%, transparent 70%)',
             filter: 'blur(80px)',
           }}
         />
         <div
-          className="absolute w-[500px] h-[300px] rounded-full"
+          className="absolute w-[450px] h-[280px] rounded-full"
           style={{
-            bottom: '20%', right: '8%',
-            background: 'radial-gradient(ellipse, rgba(212,175,55,0.07) 0%, transparent 70%)',
+            bottom: '18%', right: '6%',
+            background: 'radial-gradient(ellipse, rgba(212,175,55,0.05) 0%, transparent 70%)',
             filter: 'blur(100px)',
           }}
         />
       </motion.div>
 
-      {/* God rays — conic gradient rotating slowly */}
+      {/* ══════════════════════════════════════════════════
+          LAYER 3 — Rotating god rays
+      ══════════════════════════════════════════════════ */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         animate={{ rotate: [0, 360] }}
@@ -119,30 +202,34 @@ export default function Hero() {
         style={{
           background: `conic-gradient(
             from 0deg at 50% 48%,
-            transparent 0deg, rgba(212,175,55,0.025) 8deg, transparent 18deg,
-            transparent 78deg, rgba(212,175,55,0.018) 88deg, transparent 98deg,
-            transparent 155deg, rgba(212,175,55,0.022) 165deg, transparent 175deg,
-            transparent 235deg, rgba(212,175,55,0.015) 245deg, transparent 255deg,
-            transparent 310deg, rgba(212,175,55,0.02) 320deg, transparent 330deg,
+            transparent 0deg, rgba(212,175,55,0.022) 8deg, transparent 18deg,
+            transparent 78deg, rgba(212,175,55,0.015) 88deg, transparent 98deg,
+            transparent 155deg, rgba(212,175,55,0.018) 165deg, transparent 175deg,
+            transparent 235deg, rgba(212,175,55,0.012) 245deg, transparent 255deg,
+            transparent 310deg, rgba(212,175,55,0.018) 320deg, transparent 330deg,
             transparent 360deg
           )`,
-          filter: 'blur(12px)',
+          filter: 'blur(14px)',
           transformOrigin: '50% 48%',
         }}
       />
 
-      {/* Mouse-tracking spotlight */}
+      {/* ══════════════════════════════════════════════════
+          LAYER 4 — Mouse spotlight
+      ══════════════════════════════════════════════════ */}
       {mounted && (
         <div
-          className="absolute inset-0 pointer-events-none transition-none"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            background: `radial-gradient(circle 600px at ${mouse.x}% ${mouse.y}%, rgba(212,175,55,0.055) 0%, rgba(212,175,55,0.015) 40%, transparent 70%)`,
-            transition: 'background 0.12s ease-out',
+            background: `radial-gradient(circle 600px at ${mouse.x}% ${mouse.y}%, rgba(212,175,55,0.05) 0%, rgba(212,175,55,0.012) 40%, transparent 70%)`,
+            transition: 'background 0.14s ease-out',
           }}
         />
       )}
 
-      {/* Floating decorative particles */}
+      {/* ══════════════════════════════════════════════════
+          LAYER 5 — Floating decorative particles
+      ══════════════════════════════════════════════════ */}
       {PARTICLES.map((p, i) => (
         <motion.div
           key={i}
@@ -154,29 +241,28 @@ export default function Hero() {
           }}
           animate={{
             y: [0, -28, 4, -14, 0],
-            opacity: [0.3, 0.85, 0.55, 0.85, 0.3],
+            opacity: [0.25, 0.75, 0.45, 0.75, 0.25],
             rotate: p.shape === 'diamond' ? [0, 180, 360] : [0, 0, 0],
           }}
-          transition={{
-            duration: p.dur,
-            delay: p.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
+          transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: 'easeInOut' }}
         >
           <ParticleShape shape={p.shape} size={p.size} />
         </motion.div>
       ))}
 
-      {/* Thin horizontal scan line */}
+      {/* ══════════════════════════════════════════════════
+          LAYER 6 — Thin horizontal scan line
+      ══════════════════════════════════════════════════ */}
       <motion.div
         className="absolute left-0 right-0 h-px pointer-events-none"
-        style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(212,175,55,0.18) 40%, rgba(245,216,100,0.35) 50%, rgba(212,175,55,0.18) 60%, transparent 100%)' }}
+        style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(212,175,55,0.15) 40%, rgba(245,216,100,0.28) 50%, rgba(212,175,55,0.15) 60%, transparent 100%)' }}
         animate={{ top: ['15%', '85%', '15%'] }}
         transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
       />
 
-      {/* Main content */}
+      {/* ══════════════════════════════════════════════════
+          LAYER 7 — Hero content (parallax)
+      ══════════════════════════════════════════════════ */}
       <motion.div
         className="relative z-10 text-center px-5 sm:px-6 max-w-5xl mx-auto w-full pb-20 sm:pb-0"
         style={{ y: yContent, opacity }}
@@ -189,43 +275,35 @@ export default function Hero() {
           <div className="h-px w-8 sm:w-16 bg-gradient-to-r from-transparent via-gold-500/40 to-gold-500/70 flex-shrink-0" />
           <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 border border-gold-500/20" style={{ background: 'rgba(212,175,55,0.04)' }}>
             <div className="w-1 h-1 rounded-full bg-gold-500 animate-pulse flex-shrink-0" />
-            <span className="text-gold-400/75 text-[0.52rem] sm:text-[0.58rem] tracking-[0.2em] sm:tracking-[0.38em] font-display uppercase text-center">
+            <span className="text-gold-400/80 text-[0.52rem] sm:text-[0.58rem] tracking-[0.2em] sm:tracking-[0.38em] font-display uppercase text-center">
               Est. 2031 · Luxury Temporal Travel
             </span>
           </div>
           <div className="h-px w-8 sm:w-16 bg-gradient-to-l from-transparent via-gold-500/40 to-gold-500/70 flex-shrink-0" />
         </motion.div>
 
-        {/* Headline — each word on its own line with distinct weight */}
+        {/* Main headline */}
         <motion.h1
           variants={item}
           className="font-display font-black leading-[0.9] tracking-tight mb-0"
           style={{ fontSize: 'clamp(3.2rem, 8.5vw, 8rem)' }}
         >
-          <span
-            className="block text-white/90 mb-1"
-            style={{ textShadow: '0 0 80px rgba(212,175,55,0.08)' }}
-          >
+          <span className="block text-white mb-1" style={{ textShadow: '0 2px 40px rgba(0,0,0,0.8), 0 0 80px rgba(212,175,55,0.08)' }}>
             JOURNEY
           </span>
           <span
             className="block gold-text"
-            style={{
-              filter: 'drop-shadow(0 0 40px rgba(212,175,55,0.35)) drop-shadow(0 0 80px rgba(212,175,55,0.15))',
-            }}
+            style={{ filter: 'drop-shadow(0 0 40px rgba(212,175,55,0.4)) drop-shadow(0 0 80px rgba(212,175,55,0.18))' }}
           >
             THROUGH
           </span>
-          <span
-            className="block text-white/90 mt-1"
-            style={{ textShadow: '0 0 80px rgba(212,175,55,0.08)' }}
-          >
+          <span className="block text-white mt-1" style={{ textShadow: '0 2px 40px rgba(0,0,0,0.8), 0 0 80px rgba(212,175,55,0.08)' }}>
             TIME
           </span>
         </motion.h1>
 
         {/* Ornament divider */}
-        <motion.div variants={item} className="flex items-center justify-center gap-5 my-8">
+        <motion.div variants={item} className="flex items-center justify-center gap-5 my-7 sm:my-8">
           <div className="h-px flex-1 max-w-[100px] bg-gradient-to-r from-transparent to-gold-500/35" />
           <div className="flex items-center gap-2">
             <div className="w-px h-3 bg-gold-500/30" />
@@ -241,7 +319,8 @@ export default function Hero() {
         {/* Subheadline */}
         <motion.p
           variants={item}
-          className="text-white/40 text-[0.9rem] md:text-[1.05rem] font-body font-light leading-[1.85] tracking-[0.03em] max-w-lg mx-auto mb-10 sm:mb-12 px-2 sm:px-0"
+          className="text-white/55 text-[0.9rem] md:text-[1.05rem] font-body font-light leading-[1.85] tracking-[0.03em] max-w-lg mx-auto mb-10 sm:mb-12 px-2 sm:px-0"
+          style={{ textShadow: '0 1px 20px rgba(0,0,0,0.7)' }}
         >
           The world's only ultra-luxury temporal travel agency.
           <br className="hidden sm:block" />
@@ -250,7 +329,6 @@ export default function Hero() {
 
         {/* CTA buttons */}
         <motion.div variants={item} className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 w-full sm:w-auto">
-          {/* Primary — gold filled with glow */}
           <motion.a
             href="#destinations"
             className="relative w-full sm:w-auto px-10 py-4 text-[0.72rem] tracking-[0.22em] font-display font-bold text-black overflow-hidden text-center"
@@ -276,7 +354,6 @@ export default function Hero() {
             />
           </motion.a>
 
-          {/* Secondary — outlined */}
           <motion.a
             href="#testimonials"
             className="relative w-full sm:w-auto px-10 py-4 text-[0.72rem] tracking-[0.22em] font-display font-semibold text-gold-400 overflow-hidden text-center group"
@@ -314,11 +391,11 @@ export default function Hero() {
               )}
               <div
                 className="font-display text-xl sm:text-2xl md:text-3xl font-black gold-text leading-none"
-                style={{ filter: 'drop-shadow(0 0 12px rgba(212,175,55,0.3))' }}
+                style={{ filter: 'drop-shadow(0 0 12px rgba(212,175,55,0.35))' }}
               >
                 {stat.value}
               </div>
-              <div className="text-white/25 text-[0.52rem] sm:text-[0.58rem] tracking-[0.1em] sm:tracking-[0.14em] uppercase mt-1.5 font-body">
+              <div className="text-white/30 text-[0.52rem] sm:text-[0.58rem] tracking-[0.1em] sm:tracking-[0.14em] uppercase mt-1.5 font-body">
                 {stat.label}
               </div>
             </div>
@@ -326,17 +403,20 @@ export default function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Scroll indicator */}
+      {/* ══════════════════════════════════════════════════
+          LAYER 8 — Scroll indicator
+      ══════════════════════════════════════════════════ */}
       <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 cursor-pointer z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 1 }}
+        transition={{ delay: 2.5, duration: 1 }}
         onClick={() => document.getElementById('destinations')?.scrollIntoView({ behavior: 'smooth' })}
+        role="button"
+        aria-label="Scroll to destinations"
+        tabIndex={0}
       >
-        <span className="text-white/20 text-[0.55rem] tracking-[0.3em] font-display uppercase">
-          Scroll
-        </span>
+        <span className="text-white/25 text-[0.55rem] tracking-[0.3em] font-display uppercase">Scroll</span>
         <div className="relative w-5 h-8 border border-gold-500/25 rounded-full flex items-start justify-center pt-1.5">
           <motion.div
             className="w-1 h-1.5 rounded-full bg-gold-400"
@@ -345,15 +425,6 @@ export default function Hero() {
           />
         </div>
       </motion.div>
-
-      {/* Bottom vignette */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none"
-        style={{ background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.5) 60%, transparent 100%)' }}
-      />
-      {/* Side vignettes */}
-      <div className="absolute inset-y-0 left-0 w-24 pointer-events-none" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.4), transparent)' }} />
-      <div className="absolute inset-y-0 right-0 w-24 pointer-events-none" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.4), transparent)' }} />
     </section>
   )
 }

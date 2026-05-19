@@ -82,9 +82,10 @@ export default function DestinationCard({ destination, index }: { destination: D
               src={destination.image}
               alt={destination.title}
               fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 33vw"
-              loading={index === 0 ? 'eager' : 'lazy'}
+              className="object-cover object-center"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              priority={index === 0}
+              quality={85}
             />
           </motion.div>
 
