@@ -160,7 +160,7 @@ function TestimonialCard({ t, i }: { t: typeof testimonials[0]; i: number }) {
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="relative py-28 overflow-hidden" style={{ background: '#020202' }}>
+    <section id="testimonials" className="relative py-16 sm:py-20 lg:py-28 overflow-hidden" style={{ background: '#020202' }}>
       {/* Grid pattern */}
       <div
         className="absolute inset-0 pointer-events-none opacity-25"
@@ -183,7 +183,7 @@ export default function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-16 lg:mb-20"
         >
           <div className="flex items-center justify-center gap-3 mb-5">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-gold-500/50" />

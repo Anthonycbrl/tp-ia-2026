@@ -55,7 +55,7 @@ export default function Destinations() {
   const yHeader = useTransform(scrollYProgress, [0, 1], ['-6%', '6%'])
 
   return (
-    <section ref={sectionRef} id="destinations" className="relative py-28 bg-black overflow-hidden">
+    <section ref={sectionRef} id="destinations" className="relative py-16 sm:py-20 lg:py-28 bg-black overflow-hidden">
       {/* Background elements */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -72,7 +72,7 @@ export default function Destinations() {
         {/* Section header with subtle parallax */}
         <motion.div
           style={{ y: yHeader }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-16 lg:mb-20"
         >
           <motion.div
             initial={{ opacity: 0, y: 30 }}

@@ -178,22 +178,22 @@ export default function Hero() {
 
       {/* Main content */}
       <motion.div
-        className="relative z-10 text-center px-6 max-w-5xl mx-auto"
+        className="relative z-10 text-center px-5 sm:px-6 max-w-5xl mx-auto w-full pb-20 sm:pb-0"
         style={{ y: yContent, opacity }}
         variants={container}
         initial="hidden"
         animate="visible"
       >
         {/* Eyebrow label */}
-        <motion.div variants={item} className="flex items-center justify-center gap-4 mb-10">
-          <div className="h-px w-16 bg-gradient-to-r from-transparent via-gold-500/40 to-gold-500/70" />
-          <div className="flex items-center gap-2 px-4 py-1.5 border border-gold-500/20" style={{ background: 'rgba(212,175,55,0.04)' }}>
-            <div className="w-1 h-1 rounded-full bg-gold-500 animate-pulse" />
-            <span className="text-gold-400/75 text-[0.58rem] tracking-[0.38em] font-display uppercase whitespace-nowrap">
+        <motion.div variants={item} className="flex items-center justify-center gap-3 mb-8 sm:mb-10">
+          <div className="h-px w-8 sm:w-16 bg-gradient-to-r from-transparent via-gold-500/40 to-gold-500/70 flex-shrink-0" />
+          <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 border border-gold-500/20" style={{ background: 'rgba(212,175,55,0.04)' }}>
+            <div className="w-1 h-1 rounded-full bg-gold-500 animate-pulse flex-shrink-0" />
+            <span className="text-gold-400/75 text-[0.52rem] sm:text-[0.58rem] tracking-[0.2em] sm:tracking-[0.38em] font-display uppercase text-center">
               Est. 2031 · Luxury Temporal Travel
             </span>
           </div>
-          <div className="h-px w-16 bg-gradient-to-l from-transparent via-gold-500/40 to-gold-500/70" />
+          <div className="h-px w-8 sm:w-16 bg-gradient-to-l from-transparent via-gold-500/40 to-gold-500/70 flex-shrink-0" />
         </motion.div>
 
         {/* Headline — each word on its own line with distinct weight */}
@@ -241,20 +241,24 @@ export default function Hero() {
         {/* Subheadline */}
         <motion.p
           variants={item}
-          className="text-white/40 text-base md:text-[1.05rem] font-body font-light leading-[1.85] tracking-[0.04em] max-w-lg mx-auto mb-12"
+          className="text-white/40 text-[0.9rem] md:text-[1.05rem] font-body font-light leading-[1.85] tracking-[0.03em] max-w-lg mx-auto mb-10 sm:mb-12 px-2 sm:px-0"
         >
           The world's only ultra-luxury temporal travel agency.
-          <br />
-          Bespoke journeys to history's most magnificent moments.
+          <br className="hidden sm:block" />
+          {' '}Bespoke journeys to history's most magnificent moments.
         </motion.p>
 
         {/* CTA buttons */}
-        <motion.div variants={item} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <motion.div variants={item} className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 w-full sm:w-auto">
           {/* Primary — gold filled with glow */}
           <motion.a
             href="#destinations"
-            className="relative px-10 py-4 text-[0.72rem] tracking-[0.22em] font-display font-bold text-black overflow-hidden group"
-            style={{ background: 'linear-gradient(135deg, #D4AF37 0%, #F5D864 50%, #D4AF37 100%)' }}
+            className="relative w-full sm:w-auto px-10 py-4 text-[0.72rem] tracking-[0.22em] font-display font-bold text-black overflow-hidden text-center"
+            style={{
+              background: 'linear-gradient(135deg, #D4AF37 0%, #F5D864 50%, #D4AF37 100%)',
+              minHeight: '52px',
+              touchAction: 'manipulation',
+            }}
             whileHover={{
               scale: 1.03,
               boxShadow: '0 0 35px rgba(212,175,55,0.55), 0 0 70px rgba(212,175,55,0.25), 0 0 120px rgba(212,175,55,0.1)',
@@ -263,9 +267,8 @@ export default function Hero() {
             transition={{ type: 'spring', stiffness: 380, damping: 25 }}
           >
             <span className="relative z-10">EXPLORE DESTINATIONS</span>
-            {/* Shimmer sweep */}
             <motion.div
-              className="absolute inset-0 skew-x-12"
+              className="absolute inset-0 skew-x-12 pointer-events-none"
               style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)' }}
               initial={{ x: '-150%' }}
               animate={{ x: '250%' }}
@@ -273,11 +276,15 @@ export default function Hero() {
             />
           </motion.a>
 
-          {/* Secondary — outlined with hover glow */}
+          {/* Secondary — outlined */}
           <motion.a
             href="#testimonials"
-            className="relative px-10 py-4 text-[0.72rem] tracking-[0.22em] font-display font-semibold text-gold-400 overflow-hidden group"
-            style={{ border: '1px solid rgba(212,175,55,0.3)' }}
+            className="relative w-full sm:w-auto px-10 py-4 text-[0.72rem] tracking-[0.22em] font-display font-semibold text-gold-400 overflow-hidden text-center group"
+            style={{
+              border: '1px solid rgba(212,175,55,0.3)',
+              minHeight: '52px',
+              touchAction: 'manipulation',
+            }}
             whileHover={{
               scale: 1.03,
               boxShadow: '0 0 25px rgba(212,175,55,0.2), inset 0 0 25px rgba(212,175,55,0.04)',
@@ -294,24 +301,24 @@ export default function Hero() {
         {/* Stats row */}
         <motion.div
           variants={item}
-          className="flex items-center justify-center gap-10 md:gap-16"
+          className="flex items-center justify-center gap-5 sm:gap-10 md:gap-16"
         >
           {[
-            { value: '847+', label: 'Journeys Completed' },
-            { value: '99.9%', label: 'Safe Return Rate' },
-            { value: '12', label: 'Eras Available' },
+            { value: '847+', label: 'Journeys' },
+            { value: '99.9%', label: 'Safe Return' },
+            { value: '12', label: 'Eras' },
           ].map((stat, i) => (
             <div key={stat.label} className="text-center relative">
               {i > 0 && (
-                <div className="absolute -left-5 md:-left-8 top-1/2 -translate-y-1/2 w-px h-6 bg-gold-500/15" />
+                <div className="absolute -left-2.5 sm:-left-5 md:-left-8 top-1/2 -translate-y-1/2 w-px h-5 sm:h-6 bg-gold-500/15" />
               )}
               <div
-                className="font-display text-2xl md:text-3xl font-black gold-text leading-none"
+                className="font-display text-xl sm:text-2xl md:text-3xl font-black gold-text leading-none"
                 style={{ filter: 'drop-shadow(0 0 12px rgba(212,175,55,0.3))' }}
               >
                 {stat.value}
               </div>
-              <div className="text-white/25 text-[0.58rem] tracking-[0.14em] uppercase mt-1.5 font-body">
+              <div className="text-white/25 text-[0.52rem] sm:text-[0.58rem] tracking-[0.1em] sm:tracking-[0.14em] uppercase mt-1.5 font-body">
                 {stat.label}
               </div>
             </div>

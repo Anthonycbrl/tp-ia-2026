@@ -104,3 +104,39 @@ body::before {
   outline: 1px solid rgba(212,175,55,0.55);
   outline-offset: 2px;
 }
+
+/* ── Touch targets ──────────────────────────────────── */
+/* All interactive elements get at least 44×44px hit area */
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* ── Reduce motion ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Safe-area utilities ─────────────────────────────── */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ── Mobile section spacing ─────────────────────────── */
+@media (max-width: 640px) {
+  .section-mobile-py {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
+/* ── Tap highlight removal ──────────────────────────── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}

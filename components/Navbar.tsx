@@ -153,7 +153,8 @@ export default function Navbar() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.28 }}
-                className="mt-2 px-6 py-3 text-[0.63rem] tracking-[0.2em] font-display font-semibold text-gold-400 border border-gold-500/28 w-full hover:border-gold-400/55 transition-colors duration-300"
+                className="mt-2 px-6 py-4 text-[0.63rem] tracking-[0.2em] font-display font-semibold text-gold-400 border border-gold-500/28 w-full hover:border-gold-400/55 transition-colors duration-300"
+              style={{ minHeight: '52px', touchAction: 'manipulation' }}
               >
                 BOOK A JOURNEY
               </motion.button>

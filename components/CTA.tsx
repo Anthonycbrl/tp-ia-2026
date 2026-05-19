@@ -6,7 +6,7 @@ export default function CTA() {
   return (
     <section
       id="experiences"
-      className="relative py-36 overflow-hidden"
+      className="relative py-20 sm:py-28 lg:py-36 overflow-hidden"
       style={{ background: 'linear-gradient(180deg, #020202 0%, #000 35%, #040200 100%)' }}
     >
       {/* Deep radial glow */}
@@ -37,21 +37,22 @@ export default function CTA() {
         }}
       />
 
-      {/* Animated ring system */}
+      {/* Animated ring system — sizes clamp to viewport on mobile */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
         {[
-          { size: 680, dur: 80, dir: 1,  border: 'rgba(212,175,55,0.05)' },
-          { size: 520, dur: 55, dir: -1, border: 'rgba(212,175,55,0.07)' },
-          { size: 380, dur: 38, dir: 1,  border: 'rgba(212,175,55,0.09)' },
-          { size: 240, dur: 25, dir: -1, border: 'rgba(212,175,55,0.12)' },
-        ].map(({ size, dur, dir, border }, i) => (
+          { vw: 90, max: 680, dur: 80, dir: 1,  border: 'rgba(212,175,55,0.05)' },
+          { vw: 70, max: 520, dur: 55, dir: -1, border: 'rgba(212,175,55,0.07)' },
+          { vw: 55, max: 380, dur: 38, dir: 1,  border: 'rgba(212,175,55,0.09)' },
+          { vw: 36, max: 240, dur: 25, dir: -1, border: 'rgba(212,175,55,0.12)' },
+        ].map(({ vw, max, dur, dir, border }, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full"
             style={{
-              width: size, height: size,
+              width: `min(${vw}vw, ${max}px)`,
+              height: `min(${vw}vw, ${max}px)`,
               top: '50%', left: '50%',
-              marginTop: -size / 2, marginLeft: -size / 2,
+              transform: 'translate(-50%, -50%)',
               border: `1px solid ${border}`,
             }}
             animate={{ rotate: dir * 360 }}
@@ -123,15 +124,15 @@ export default function CTA() {
 
           {/* CTAs */}
           <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-14"
+            className="flex flex-col items-stretch sm:flex-row sm:items-center justify-center gap-3 sm:gap-5 mb-12 sm:mb-14 w-full sm:w-auto"
             initial={{ opacity: 0, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.75, delay: 0.18 }}
           >
             <motion.button
-              className="relative px-12 py-4 text-[0.72rem] tracking-[0.24em] font-display font-bold text-black overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #C9A840, #D4AF37, #F5D864, #D4AF37)' }}
+              className="relative w-full sm:w-auto px-10 sm:px-12 py-4 text-[0.72rem] tracking-[0.22em] sm:tracking-[0.24em] font-display font-bold text-black overflow-hidden"
+              style={{ minHeight: '52px', touchAction: 'manipulation', background: 'linear-gradient(135deg, #C9A840, #D4AF37, #F5D864, #D4AF37)' }}
               whileHover={{
                 scale: 1.03,
                 boxShadow: '0 0 40px rgba(212,175,55,0.6), 0 0 80px rgba(212,175,55,0.25), 0 0 140px rgba(212,175,55,0.08)',
